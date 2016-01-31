@@ -1,6 +1,7 @@
 include( "menu2/util.lua" )
 
 include( "menu/mount/mount.lua" ) -- workshop
+include( "menu2/bgstuff.lua") -- ayy cool stuff
 
 --include( "menu/getmaps.lua" )
 include( "menu2/sv_loadingurl.lua" )

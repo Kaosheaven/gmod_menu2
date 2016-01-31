@@ -1,5 +1,6 @@
-local R=function(x) return function() return RawConsoleCommand(x) end end
+local R=function(a,b,c,d,e) return function() return RunConsoleCommand(a,b,c,d,e) end end
 local M=function(x) return function() return RunGameUICommand(x) end end
+local C=function(x) return function() return JoinServer(x) end end
 local NOT=function(f) return function(...) return not f(...) end end
 
 local mainmenu = {
@@ -7,11 +8,16 @@ local mainmenu = {
 	{"resume_game",					gui.HideGameUI,                      "icon16/joystick.png"				,show=IsInGame},
 	{"disconnect",					M"disconnect",                      "icon16/disconnect.png"				,show=IsInGame},
 	{"reconnect",					R"retry",                      		"icon16/connect.png"				,show=WasInGame},
-	{"GameUI_GameMenu_PlayerList",	M"openplayerlistdialog",        	"icon16/group_delete.png"			,show=IsInGame},
+	{"server_players",				M"openplayerlistdialog",        	"icon16/group_delete.png"			,show=IsInGame},
 	
 	{"",show=WasInGame},
 	{"new_game",					M"opencreatemultiplayergamedialog", "icon16/server.png"					},
-	{"server_list",					M"openserverbrowser",               "icon16/world.png"					},
+	{"legacy_browser",				M"openserverbrowser",               "icon16/world.png"					},
+
+	{""},
+	{"Join Metastruct",				C"g1.metastruct.org",       "icon16/server.png"					},
+	{"Join FlexBox",				C"xenora.net:27018",        "icon16/server.png"					},
+	{"Join Intertech",				C"31.186.251.45",        	"icon16/server.png"					},
 	
 	{""},
 	{"options",						M"openoptionsdialog",               "icon16/wrench.png"					},
@@ -39,13 +45,15 @@ local mainmenu = {
 local menulist_wrapper = vgui.Create('DPanelList',nil,'menulist_wrapper')
 local isours
 if pnlMainMenu and pnlMainMenu:IsValid() then pnlMainMenu:Remove() end
-	
-_G.pnlMainMenu = menulist_wrapper
+
+local bg = vgui.Create("menu2_background")
+
+_G.pnlMainMenu = bg
+menulist_wrapper:SetParent(bg)
 menulist_wrapper:EnableVerticalScrollbar(true)
 menulist_wrapper:SetWide(350)
 menulist_wrapper:Dock(LEFT)
 menulist_wrapper:DockMargin(32,32,32,32)
-
 
 local div_hack = vgui.Create'EditablePanel'
 div_hack:SetTall(52)
@@ -63,7 +71,7 @@ function CreateAddons()
 	
 	addonslist = vgui.Create('DForm',menulist_wrapper,'addonslist')
 	addonslist:Dock(TOP)
-	addonslist:SetName"Installed Addons"
+	addonslist:SetName"#manage_addons"
 	addonslist:SetExpanded(false)
 	
 	addonslist:SetCookieName"addonslist"
@@ -73,11 +81,16 @@ function CreateAddons()
 	menulist_wrapper:InvalidateLayout(true)
 	addonslist:InvalidateLayout(true)
 	addonslist.Header:SetIcon 'icon16/plugin.png'
+	function addonslist:Paint(w,h)
+		draw.RoundedBox(4,0,0,w,20,Color(0,150,130))
+	end
 	
 
 	local btn = vgui.Create("DButton",addonslist,'addonslist_button')
 		addonslist:AddItem(btn)
-		btn:SetText("Enable All")
+		btn:SetText("#addons.enableall")
+		btn:SetIcon 'icon16/add.png'
+		
 		function btn.DoClick(btn)
 			for k,v in next,engine.GetAddons() do
 				steamworks.SetShouldMountAddon(v.wsid or v.file,true)
@@ -85,10 +98,15 @@ function CreateAddons()
 			isours = true
 			steamworks.ApplyAddons()
 			isours = true
+			
+			CreateMenu()
+
 		end
 	local btn = vgui.Create("DButton",addonslist,'addonslist_button')
 		addonslist:AddItem(btn)
-		btn:SetText("Disable All")
+		btn:SetText("#addons.disableall")
+		btn:SetIcon 'icon16/delete.png'
+		
 		function btn.DoClick(btn)
 			for k,v in next,engine.GetAddons() do
 				steamworks.SetShouldMountAddon(v.wsid or v.file,false)
@@ -96,11 +114,12 @@ function CreateAddons()
 			isours = true
 			steamworks.ApplyAddons()
 			isours = true
-
+			CreateMenu()
 		end
 	local btn = vgui.Create("DButton",addonslist,'addonslist_button')
 		addonslist:AddItem(btn)
-		btn:SetText("Unsubscribe All")
+		btn:SetText("#addons.uninstallall")
+		btn:SetIcon 'icon16/stop.png'
 		function btn.DoClick(btn)
 			for k,v in next,engine.GetAddons() do
 				if v.wsid then
@@ -109,7 +128,7 @@ function CreateAddons()
 				end
 			end
 			isours = true steamworks.ApplyAddons() isours = true
-		
+			CreateMenu()
 		end
 
 	local function AddButton(data,title,mounted,downloaded,wsid,filepath)
@@ -134,11 +153,11 @@ function CreateAddons()
 			end
 			btn.Label.DoRightClick=function()
 				local m =DermaMenu()
-					m:AddOption("Unsubscribe",function()
+					m:AddOption("#addon.unsubscribe",function()
 						print("Unsubscribe",wsid)
 						steamworks.Unsubscribe(wsid)
 					end)
-					m:AddOption("Copy link",function()
+					m:AddOption("#copy",function()
 						SetClipboardText('http://steamcommunity.com/sharedfiles/filedetails/?id='..wsid)
 					end)
 				m:Open()
@@ -186,6 +205,10 @@ function CreateExtraSettings()
 	settingslist.Header:SetIcon 'icon16/cog.png'
 	settingslist:SetCookieName"settingslist"
 	settingslist:LoadCookies()
+
+	function settingslist:Paint(w,h)
+		draw.RoundedBox(4,0,0,w,20,Color(0,150,130))
+	end
 	
 	menulist_wrapper:AddItem(settingslist)
 	menulist_wrapper:InvalidateLayout(true)
@@ -232,11 +255,15 @@ function CreateGames()
 	
 	gameslist = vgui.Create('DForm',menulist_wrapper,'gameslist')
 	gameslist:Dock(TOP)
-	gameslist:SetName"Mounted games"
+	gameslist:SetName"#mounted_games"
 	gameslist:SetExpanded(false)
 	gameslist.Header:SetIcon 'icon16/joystick.png'
 	gameslist:SetCookieName"gameslist"
 	gameslist:LoadCookies()
+
+	function gameslist:Paint(w,h)
+		draw.RoundedBox(4,0,0,w,20,Color(0,150,130))
+	end
 	
 	menulist_wrapper:AddItem(gameslist)
 	menulist_wrapper:InvalidateLayout(true)
@@ -283,7 +310,9 @@ end
 
 
 local menulist
-function CreateMenu()
+local creating
+local function _CreateMenu()
+	creating = false
 	
 	lastscroll = menulist_wrapper.VBar:GetScroll()
 	
@@ -296,6 +325,9 @@ function CreateMenu()
 	menulist:SetCookieName"menulist"
 	menulist:LoadCookies()
 	
+	function menulist:Paint(w,h)
+		draw.RoundedBox(4,0,0,w,20,Color(0,150,130))
+	end
 	
 	menulist_wrapper:AddItem(menulist)
 	menulist_wrapper:InvalidateLayout(true)
@@ -341,10 +373,27 @@ function CreateMenu()
 	
 	CreateExtraSettings()
 	CreateGames()
+	
+	menulist:InvalidateLayout(true)
+	
 end
-CreateMenu()
+
+function CreateMenu()
+	if creating then return end
+	creating = true
+	timer.Simple(0.2,function()
+		_CreateMenu()
+	end)
+end
+
+--CreateMenu()
 
 hook.Add( "GameContentsChanged", "CreateMenu", function(mount,addon)
+	if mount then return end
+	
+	-- EEK
+	if not mount and not addon then return end
+	
 	if isours then isours = false return end
 
 	CreateMenu()
@@ -356,8 +405,11 @@ hook.Add( "InGame", "CreateMenu", function(is)
 end )
 
 hook.Add( "ConsoleVisible", "CreateMenu", function(is)
-	--CreateMenu()
-	--print"ConsoleVisible"
+	
+	if IsDeveloper() then 
+		CreateMenu()
+	end
+	
 end )
 
 hook.Add( "LoadingStatus", "CreateMenu", function(status)
