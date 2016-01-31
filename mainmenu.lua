@@ -7,6 +7,16 @@ local DividerR = CreateClientConVar("menu2_color_r",0):GetInt()
 local DividerG = CreateClientConVar("menu2_color_g",150):GetInt()
 local DividerB = CreateClientConVar("menu2_color_b",130):GetInt()
 
+surface.CreateFont("menu2_button",{
+	font = "Roboto Medium",
+	size = 24,
+})
+
+surface.CreateFont("menu2_text",{
+	font = "Roboto Medium",
+	size = 16,
+})
+
 local mainmenu = {
 	{""},
 	{"resume_game",					gui.HideGameUI,                      "icon16/joystick.png"				,show=IsInGame},
@@ -88,6 +98,7 @@ function CreateAddons()
 	menulist_wrapper:InvalidateLayout(true)
 	addonslist:InvalidateLayout(true)
 	addonslist.Header:SetIcon 'icon16/plugin.png'
+	addonslist.Header:SetFont("menu2_text")
 	function addonslist:Paint(w,h)
 		draw.RoundedBox(4,0,0,w,20,Color(DividerR,DividerG,DividerB))
 	end
@@ -97,6 +108,7 @@ function CreateAddons()
 		addonslist:AddItem(btn)
 		btn:SetText("#addons.enableall")
 		btn:SetIcon 'icon16/add.png'
+		btn:SetFont("menu2_text")
 		
 		function btn.DoClick(btn)
 			for k,v in next,engine.GetAddons() do
@@ -113,6 +125,7 @@ function CreateAddons()
 		addonslist:AddItem(btn)
 		btn:SetText("#addons.disableall")
 		btn:SetIcon 'icon16/delete.png'
+		btn:SetFont("menu2_text")
 		
 		function btn.DoClick(btn)
 			for k,v in next,engine.GetAddons() do
@@ -127,6 +140,7 @@ function CreateAddons()
 		addonslist:AddItem(btn)
 		btn:SetText("#addons.uninstallall")
 		btn:SetIcon 'icon16/stop.png'
+		btn:SetFont("menu2_text")
 		function btn.DoClick(btn)
 			for k,v in next,engine.GetAddons() do
 				if v.wsid then
@@ -146,6 +160,7 @@ function CreateAddons()
 			btn:SetChecked(mounted)
 			btn:SetBright(true)
 			btn:SetDisabled(not downloaded)
+			btn.Label:SetFont("menu2_text")
 			btn:SizeToContents()
 			function btn:OnChange(val)
 				print("mount",filepath,val)
@@ -210,6 +225,7 @@ function CreateExtraSettings()
 	settingslist:SetName"Extra Settings"
 	settingslist:SetExpanded(false)
 	settingslist.Header:SetIcon 'icon16/cog.png'
+	settingslist.Header:SetFont("menu2_text")
 	settingslist:SetCookieName"settingslist"
 	settingslist:LoadCookies()
 
@@ -229,6 +245,7 @@ function CreateExtraSettings()
 			c:SetText( txt )
 			c:SetConVar(cvar)
 			c:SetBright(true)
+			c.Label:SetFont("menu2_text")
 			c:SizeToContents()
 			c:InvalidateLayout(true)
 		return c
@@ -236,18 +253,21 @@ function CreateExtraSettings()
 
 	local x = vgui.Create( 'DLabel',settingslist)
 	x:SetText"Loading Screen"
+	x:SetFont("menu2_text")
 	settingslist:AddItem(x)
 	AddCheck( "Enable","lua_loading_screen")
 	AddCheck( "Transparency","lua_loading_screen_transp")
 	AddCheck( "Try hiding","lua_loading_screen_hide")
 	local x = vgui.Create( 'DLabel',settingslist)
 	x:SetText"Download / Upload"
+	x:SetFont("menu2_text")
 	settingslist:AddItem(x)
 	AddCheck( "Allow DL","cl_allowdownload")
 	AddCheck( "Allow UL","cl_allowupload")
 	AddCheck( "FastDL debug","download_debug")
 	local x = vgui.Create( 'DLabel',settingslist)
 	x:SetText" "
+	x:SetFont("menu2_text")
 	settingslist:AddItem(x)
 	
 end
@@ -265,6 +285,7 @@ function CreateGames()
 	gameslist:SetName"#mounted_games"
 	gameslist:SetExpanded(false)
 	gameslist.Header:SetIcon 'icon16/joystick.png'
+	gameslist.Header:SetFont("menu2_text")
 	gameslist:SetCookieName"gameslist"
 	gameslist:LoadCookies()
 
@@ -284,6 +305,7 @@ function CreateGames()
 			btn:SetChecked(mounted)
 			btn:SetBright(true)
 			btn:SetDisabled(not owned or not installed)
+			btn.Label:SetFont("menu2_text")
 			btn:SizeToContents()
 			function btn:OnChange(val)
 				engine.SetMounted(depot,val)
@@ -354,7 +376,7 @@ local function _CreateMenu()
 		local btn = vgui.Create("DButton",menulist,'menulist_button')
 			menulist:AddItem(btn)
 			btn:SetText("#"..text)
-			btn:SetFont"closecaption_normal"
+			btn:SetFont"menu2_button"
 			btn:SizeToContents()
 		btn.DoClick=function()
 			menucmd()
