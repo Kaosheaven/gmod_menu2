@@ -3,7 +3,18 @@ local MenuGradient = Material( "../html/img/gradient.png", "nocull smooth" )
 
 local Images = {}
 
-local Active = nil
+local mat = Material("../backgrounds/gm_construct_m_1280002.jpg","nocull smooth")
+
+local Active = {
+		Ratio = mat:GetInt( "$realwidth" ) / mat:GetInt( "$realheight" ),
+		Size = 1,
+		Angle = 0,
+		AngleVel = -( 5 / 30 ),
+		SizeVel = ( 0.3 / 30 ),
+		Alpha = 255,
+		DieTime = 30,
+		mat = mat
+	}
 local Outgoing = nil
 
 local function Think( tbl )
@@ -42,7 +53,7 @@ end
 
 function DrawBackground()
 
-	if ( !IsInGame() ) then 
+	if ( !IsInGame() ) then
 
 		if ( Active ) then
 			Think( Active )
@@ -82,11 +93,8 @@ end
 
 local LastGamemode = "none"
 
-function ChangeBackground( currentgm )
+function ChangeBackground()
 
-	if ( currentgm && currentgm == LastGamemode ) then return end
-	if ( currentgm ) then LastGamemode = currentgm end
-	
 	local img = table.Random( Images )
 	
 	if ( !img ) then return end
@@ -140,12 +148,18 @@ end
 
 function PANEL:Paint()
 	DrawBackground()
+
+	if ( self.IsInGame != IsInGame() ) then
+
+		self.IsInGame = IsInGame()
+
+		if ( self.IsInGame ) then
+			if ( IsValid( self.InnerPanel ) ) then self.InnerPanel:Remove() end
+		end
+
+	end
 end
 
-function PANEL:RefreshContent()
-	self:RefreshGamemodes()
-	self:RefreshAddons()
-end
 
 function PANEL:RefreshGamemodes()
 	local json = util.TableToJSON( engine.GetGamemodes() )
@@ -159,7 +173,7 @@ function PANEL:UpdateBackgroundImages()
 		self:ScreenshotScan( "backgrounds/" )
 	end
 
-	ChangeBackground( engine.ActiveGamemode() )
+	ChangeBackground()
 end
 
 vgui.Register( "menu2_background", PANEL, "EditablePanel" )

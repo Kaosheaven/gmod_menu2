@@ -18,6 +18,9 @@ local mainmenu = {
 	{"Join Metastruct",				C"g1.metastruct.org",       "icon16/server.png"					},
 	{"Join FlexBox",				C"xenora.net:27018",        "icon16/server.png"					},
 	{"Join Intertech",				C"31.186.251.45",        	"icon16/server.png"					},
+
+	{""},
+	{"Change Background",			ChangeBackground,			"icon16/picture.png"				},
 	
 	{""},
 	{"options",						M"openoptionsdialog",               "icon16/wrench.png"					},
@@ -42,14 +45,14 @@ local mainmenu = {
 -- client.vdf browser/editor
 -- 
 
-local menulist_wrapper = vgui.Create('DPanelList',nil,'menulist_wrapper')
 local isours
 if pnlMainMenu and pnlMainMenu:IsValid() then pnlMainMenu:Remove() end
 
 local bg = vgui.Create("menu2_background")
+bg:ScreenshotScan( "backgrounds/" )
 
 _G.pnlMainMenu = bg
-menulist_wrapper:SetParent(bg)
+local menulist_wrapper = vgui.Create('DPanelList',bg,'menulist_wrapper')
 menulist_wrapper:EnableVerticalScrollbar(true)
 menulist_wrapper:SetWide(350)
 menulist_wrapper:Dock(LEFT)
@@ -410,6 +413,10 @@ hook.Add( "ConsoleVisible", "CreateMenu", function(is)
 		CreateMenu()
 	end
 	
+end )
+
+hook.Add( "MenuStart", "CreateMenu", function(status)
+	CreateMenu()
 end )
 
 hook.Add( "LoadingStatus", "CreateMenu", function(status)
