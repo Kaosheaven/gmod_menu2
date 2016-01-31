@@ -3,6 +3,10 @@ local M=function(x) return function() return RunGameUICommand(x) end end
 local C=function(x) return function() return JoinServer(x) end end
 local NOT=function(f) return function(...) return not f(...) end end
 
+local DividerR = CreateClientConVar("menu2_color_r",0):GetInt()
+local DividerG = CreateClientConVar("menu2_color_g",150):GetInt()
+local DividerB = CreateClientConVar("menu2_color_b",130):GetInt()
+
 local mainmenu = {
 	{""},
 	{"resume_game",					gui.HideGameUI,                      "icon16/joystick.png"				,show=IsInGame},
@@ -85,7 +89,7 @@ function CreateAddons()
 	addonslist:InvalidateLayout(true)
 	addonslist.Header:SetIcon 'icon16/plugin.png'
 	function addonslist:Paint(w,h)
-		draw.RoundedBox(4,0,0,w,20,Color(0,150,130))
+		draw.RoundedBox(4,0,0,w,20,Color(DividerR,DividerG,DividerB))
 	end
 	
 
@@ -210,7 +214,7 @@ function CreateExtraSettings()
 	settingslist:LoadCookies()
 
 	function settingslist:Paint(w,h)
-		draw.RoundedBox(4,0,0,w,20,Color(0,150,130))
+		draw.RoundedBox(4,0,0,w,20,Color(DividerR,DividerG,DividerB))
 	end
 	
 	menulist_wrapper:AddItem(settingslist)
@@ -265,7 +269,7 @@ function CreateGames()
 	gameslist:LoadCookies()
 
 	function gameslist:Paint(w,h)
-		draw.RoundedBox(4,0,0,w,20,Color(0,150,130))
+		draw.RoundedBox(4,0,0,w,20,Color(DividerR,DividerG,DividerB))
 	end
 	
 	menulist_wrapper:AddItem(gameslist)
@@ -329,7 +333,7 @@ local function _CreateMenu()
 	menulist:LoadCookies()
 	
 	function menulist:Paint(w,h)
-		draw.RoundedBox(4,0,0,w,20,Color(0,150,130))
+		draw.RoundedBox(4,0,0,w,20,Color(DividerR,DividerG,DividerB))
 	end
 	
 	menulist_wrapper:AddItem(menulist)

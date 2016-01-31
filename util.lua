@@ -7,20 +7,18 @@ do
 	end
 end
 
-if IsDeveloper() then
-	local function lua_run_menu(_,_,_,code)
-		local func = CompileString(code,"",false)
-		if isstring(func) then
-			Msg"Invalid syntax> "print(func)
-			return
-		end
-		MsgN("> ",code)
-		xpcall(func,function(err)
-			print(debug.traceback(err))
-		end)
+local function lua_run_menu(_,_,_,code)
+	local func = CompileString(code,"",false)
+	if isstring(func) then
+		Msg"Invalid syntax> "print(func)
+		return
 	end
-	concommand.Add("lua_run_menu",lua_run_menu)
+	MsgN("> ",code)
+	xpcall(func,function(err)
+		print(debug.traceback(err))
+	end)
 end
+concommand.Add("lua_run_menu",lua_run_menu)
 
 function gamemenucommand(str)
 	RunGameUICommand(str)
