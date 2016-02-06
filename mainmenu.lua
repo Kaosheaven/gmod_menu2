@@ -17,6 +17,38 @@ surface.CreateFont("menu2_text",{
 	size = 16,
 })
 
+local function iconbrowser()
+	local frame = vgui.Create("DFrame")
+	frame:SetSize(400,300)
+	frame:SetPos(5,ScrH()-305)
+	frame:SetTitle("Icon Browser")
+	frame:MakePopup()
+	local path_pnl = vgui.Create("EditablePanel",frame)
+	path_pnl:Dock(TOP)
+	path_pnl:DockMargin(4,0,4,4)
+	path_pnl:SetTall(24)
+	local path = vgui.Create("DTextEntry",path_pnl)
+	path:SetText("")
+	path:Dock(FILL)
+	path:SetEditable(false)
+	local copy = vgui.Create("DButton",path_pnl)
+	copy:Dock(RIGHT)
+	copy:SetWide(24)
+	copy:SetImage("icon16/page_copy.png")
+	copy:SetText("")
+	function copy:DoClick()
+		SetClipboardText(path:GetText())
+	end
+	local browser = vgui.Create("DIconBrowser",frame)
+	browser:Dock(FILL)
+	browser:DockMargin(4,0,4,4)
+	function browser:OnChange()
+		path:SetText(self:GetSelectedIcon())
+	end
+end
+
+concommand.Add("iconbrowser",iconbrowser)
+
 local mainmenu = {
 	{""},
 	{"resume_game",					gui.HideGameUI,                      "icon16/joystick.png"				,show=IsInGame},
@@ -28,18 +60,20 @@ local mainmenu = {
 	{"new_game",					M"opencreatemultiplayergamedialog", "icon16/server.png"					},
 	{"legacy_browser",				M"openserverbrowser",               "icon16/world.png"					},
 
+
 	{""},
-	{"Join Metastruct",				C"g1.metastruct.org",       "icon16/server.png"					},
+	{"Join Metastruct #1",			C"g1.metastruct.org",       "icon16/server.png"					},
+	{"Join Metastruct #2",			C"g2.metastruct.org",       "icon16/server.png"					},
 	{"Join FlexBox",				C"xenora.net:27018",        "icon16/server.png"					},
 	{"Join Intertech",				C"31.186.251.45",        	"icon16/server.png"					},
 
 	{""},
 	{"Change Background",			ChangeBackground,			"icon16/picture.png"				},
+	{"Reload Menu",					 function() include'includes/menu.lua' hook.Call("MenuStart") end,		"icon16/arrow_refresh.png"	},
 	
 	{""},
 	{"options",						M"openoptionsdialog",               "icon16/wrench.png"					},
-	{"GameUI_Console",				R"showconsole",                   	"icon16/application_xp_terminal.png",
-		show=function() return DEVELOPER and not gui.IsConsoleVisible() end},
+	{"GameUI_Console",				R"showconsole",                   	"icon16/application_xp_terminal.png"},
 	
 	{""},
 	{"GameUI_Quit",					M"quitnoconfirm",                   "icon16/door.png"					},
