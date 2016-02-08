@@ -64,8 +64,9 @@ local mainmenu = {
 	{""},
 	{"Join Metastruct #1",			C"g1.metastruct.org",       "icon16/server.png"					},
 	{"Join Metastruct #2",			C"g2.metastruct.org",       "icon16/server.png"					},
-	{"Join FlexBox",				C"xenora.net:27018",        "icon16/server.png"					},
-	{"Join Intertech",				C"31.186.251.45",        	"icon16/server.png"					},
+	{"Join Xenora",					C"xenora.net:27035",       "icon16/server.png"					},
+	{"Join FlexBox",					C"xenora.net:27018",       "icon16/server.png"					},
+	{"Join Intertech",				C"31.186.251.45",        	  "icon16/server.png"					},
 
 	{""},
 	{"Change Background",			ChangeBackground,			"icon16/picture.png"				},
